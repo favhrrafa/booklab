@@ -1,6 +1,5 @@
 // Layout admin – lapisan kedua dari tiga lapisan RBAC.
-// requireAdminOrRedirect() melakukan verifikasi kriptografis cookie.
-// (Lapisan 1: middleware; Lapisan 3: requireAdmin() di tiap Server Action)
+// requireAdminOrRedirect() melakukan verifikasi kriptografis cookie sesi.
 
 import { requireAdminOrRedirect } from "@/lib/session";
 import { logoutAdmin } from "@/app/login/actions";
@@ -11,37 +10,46 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Verifikasi penuh sesi – redirect ke /login jika tidak valid
   await requireAdminOrRedirect();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       {/* Header Admin */}
-      <header className="bg-blue-900 text-white">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="font-bold text-lg">🔐 PinjamLab Admin</span>
-            <nav className="hidden sm:flex gap-1">
+      <header className="bg-slate-900 text-white border-b border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-5">
+            {/* Logo */}
+            <Link href="/admin" className="flex items-center gap-2 group">
+              <span className="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center text-white text-xs font-bold">
+                PL
+              </span>
+              <span className="text-sm font-semibold text-slate-200 group-hover:text-white transition-colors">
+                Admin
+              </span>
+            </Link>
+
+            {/* Nav */}
+            <nav className="hidden sm:flex items-center gap-1">
               <Link
                 href="/admin"
-                className="px-3 py-1.5 rounded text-sm hover:bg-blue-800 transition-colors"
+                className="px-3 py-1.5 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
               >
                 Dashboard
               </Link>
               <Link
                 href="/admin/ruang"
-                className="px-3 py-1.5 rounded text-sm hover:bg-blue-800 transition-colors"
+                className="px-3 py-1.5 rounded-lg text-sm text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
               >
                 Kelola Ruang
               </Link>
             </nav>
           </div>
 
-          {/* Tombol Keluar */}
+          {/* Logout */}
           <form action={logoutAdmin}>
             <button
               type="submit"
-              className="text-sm bg-blue-800 hover:bg-blue-700 px-3 py-1.5 rounded transition-colors"
+              className="text-xs font-medium text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition-colors border border-slate-700"
             >
               Keluar
             </button>
@@ -49,8 +57,7 @@ export default async function AdminLayout({
         </div>
       </header>
 
-      {/* Konten halaman admin */}
-      <main className="max-w-6xl mx-auto px-4 py-6">{children}</main>
+      <main className="max-w-6xl mx-auto px-4 py-8">{children}</main>
     </div>
   );
 }

@@ -34,8 +34,9 @@ interface PageProps {
 export default async function AdminPage({ searchParams }: PageProps) {
   const { status: statusParam } = await searchParams;
 
-  // Fallback ke 'semua' jika nilai tidak valid
-  const filter: FilterStatus = STATUS_VALID.includes(statusParam as FilterStatus)
+  const filter: FilterStatus = STATUS_VALID.includes(
+    statusParam as FilterStatus
+  )
     ? (statusParam as FilterStatus)
     : "semua";
 
@@ -50,13 +51,18 @@ export default async function AdminPage({ searchParams }: PageProps) {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Dashboard Permohonan
-        </h1>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-7">
+        <div>
+          <h1 className="text-xl font-bold text-slate-900">Dashboard Permohonan</h1>
+          <p className="text-sm text-slate-400 mt-0.5">
+            {daftarPeminjaman.length} permohonan
+            {filter !== "semua" ? ` · ${labelFilter[filter]}` : ""}
+          </p>
+        </div>
         <Link
           href="/admin/ruang"
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
         >
           Kelola Ruang →
         </Link>
@@ -68,10 +74,10 @@ export default async function AdminPage({ searchParams }: PageProps) {
           <Link
             key={s}
             href={`/admin?status=${s}`}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
               filter === s
-                ? "bg-blue-700 text-white"
-                : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                ? "bg-blue-600 text-white"
+                : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-800"
             }`}
           >
             {labelFilter[s]}
@@ -79,77 +85,93 @@ export default async function AdminPage({ searchParams }: PageProps) {
         ))}
       </div>
 
-      {/* Tabel Peminjaman */}
+      {/* Daftar */}
       {daftarPeminjaman.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">
-          <p>Tidak ada permohonan dengan status &quot;{labelFilter[filter]}&quot;.</p>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-20 text-center">
+          <p className="text-slate-400">
+            Tidak ada permohonan dengan status &quot;{labelFilter[filter]}&quot;.
+          </p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {daftarPeminjaman.map((p) => {
             const ruang = getRuangById(p.ruang_id);
             return (
               <div
                 key={p.id}
-                className="bg-white border border-gray-200 rounded-xl p-5"
+                className="bg-white border border-slate-200 rounded-xl shadow-sm p-5"
               >
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs text-gray-400 font-mono">
-                        #{p.id}
-                      </span>
-                      <BadgeStatus status={p.status} />
-                    </div>
-                    <h2 className="font-semibold text-gray-900">
+                {/* Row atas: ID + status + nama ruang + waktu ajukan */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                  <div className="flex items-center gap-2.5 flex-wrap">
+                    <span className="text-xs font-mono text-slate-400">
+                      #{p.id}
+                    </span>
+                    <BadgeStatus status={p.status} />
+                    <span className="font-semibold text-slate-800 text-sm">
                       {ruang?.nama ?? `Ruang #${p.ruang_id}`}
-                    </h2>
+                    </span>
                   </div>
-                  <div className="text-xs text-gray-400">
-                    Diajukan: {formatWaktu(p.dibuat)}
-                  </div>
+                  <span className="text-xs text-slate-400 flex-shrink-0">
+                    {formatWaktu(p.dibuat)}
+                  </span>
                 </div>
 
-                <dl className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm mb-3">
+                {/* Detail grid */}
+                <dl className="grid grid-cols-2 sm:grid-cols-4 gap-y-3 gap-x-4 text-sm mb-4">
                   <div>
-                    <dt className="text-gray-500 text-xs">Peminjam</dt>
-                    <dd className="font-medium text-gray-800">{p.peminjam}</dd>
+                    <dt className="text-xs text-slate-400 uppercase tracking-wide mb-0.5">
+                      Peminjam
+                    </dt>
+                    <dd className="font-medium text-slate-800">{p.peminjam}</dd>
                   </div>
                   <div>
-                    <dt className="text-gray-500 text-xs">Tanggal</dt>
-                    <dd className="font-medium text-gray-800">
+                    <dt className="text-xs text-slate-400 uppercase tracking-wide mb-0.5">
+                      Tanggal
+                    </dt>
+                    <dd className="font-medium text-slate-800">
                       {formatTanggal(p.tanggal)}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-gray-500 text-xs">Jam</dt>
-                    <dd className="font-medium text-gray-800 font-mono">
+                    <dt className="text-xs text-slate-400 uppercase tracking-wide mb-0.5">
+                      Jam
+                    </dt>
+                    <dd className="font-medium text-slate-800 font-mono">
                       {p.mulai}–{p.selesai}
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-gray-500 text-xs">Jumlah</dt>
-                    <dd className="font-medium text-gray-800">
+                    <dt className="text-xs text-slate-400 uppercase tracking-wide mb-0.5">
+                      Jumlah
+                    </dt>
+                    <dd className="font-medium text-slate-800">
                       {p.jumlah_orang} orang
                     </dd>
                   </div>
                 </dl>
 
-                <div className="text-sm text-gray-600 mb-3">
-                  <span className="text-gray-500 text-xs">Keperluan: </span>
+                {/* Keperluan */}
+                <div className="bg-slate-50 rounded-lg px-3.5 py-2.5 text-sm text-slate-600 mb-3">
+                  <span className="text-xs text-slate-400 font-medium uppercase tracking-wide">
+                    Keperluan:{" "}
+                  </span>
                   {p.keperluan}
                 </div>
 
+                {/* Alasan tolak */}
                 {p.alasan_tolak && (
-                  <div className="text-sm bg-red-50 border border-red-200 rounded p-2 mb-3">
-                    <span className="text-red-600 font-medium">Alasan Tolak: </span>
-                    <span className="text-red-700">{p.alasan_tolak}</span>
+                  <div className="bg-red-50 border border-red-100 rounded-lg px-3.5 py-2.5 text-sm text-red-700 mb-3">
+                    <span className="text-xs text-red-400 font-medium uppercase tracking-wide">
+                      Alasan Tolak:{" "}
+                    </span>
+                    {p.alasan_tolak}
                   </div>
                 )}
 
-                {/* Tombol aksi hanya muncul untuk status menunggu */}
+                {/* Tombol aksi (hanya menunggu) */}
                 {p.status === "menunggu" && (
-                  <div className="flex flex-wrap gap-2 pt-2 border-t border-gray-100">
+                  <div className="flex flex-wrap gap-2 pt-3 border-t border-slate-100">
                     <TombolSetujui peminjamanId={p.id} />
                     <TombolTolak peminjamanId={p.id} />
                   </div>
