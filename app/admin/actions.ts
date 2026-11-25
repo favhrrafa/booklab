@@ -1,14 +1,10 @@
 "use server";
 
-// Server Actions untuk dashboard admin: approve & reject peminjaman.
-// requireAdmin() dipanggil di AWAL setiap action – lapisan 3 RBAC.
+// Server Actions untuk dashboard admin: approve & reject peminjaman
+// requireAdmin() dipanggil di AWAL – lapisan 3 RBAC (Server Action adalah public POST endpoint)
 
 import { requireAdmin } from "@/lib/session";
-import {
-  getPeminjamanById,
-  updateStatusPeminjaman,
-  cekBentrok,
-} from "@/lib/dummy-data";
+import { getPeminjamanById, updateStatusPeminjaman, cekBentrok } from "@/lib/dummy-data";
 import { revalidatePath } from "next/cache";
 
 export interface AdminActionState {
@@ -16,16 +12,14 @@ export interface AdminActionState {
   sukses?: string;
 }
 
-// Action: Setujui peminjaman
+// Setujui peminjaman: re-check bentrok dulu agar race condition tercover
 export async function setujuiPeminjaman(
   _prevState: AdminActionState,
   formData: FormData
 ): Promise<AdminActionState> {
-  // Lapisan 3 RBAC: tolak jika bukan admin terautentikasi
   await requireAdmin();
 
-  const idStr = formData.get("peminjaman_id") as string;
-  const id = parseInt(idStr, 10);
+  const id = parseInt(formData.get("peminjaman_id") as string, 10);
   if (isNaN(id)) return { error: "ID tidak valid." };
 
   const data = getPeminjamanById(id);
@@ -36,21 +30,9 @@ export async function setujuiPeminjaman(
     return { error: "Hanya peminjaman berstatus menunggu yang dapat disetujui." };
   }
 
-  // Re-check bentrok sebelum approve (cegah race condition)
-  // Exclude diri sendiri dari pengecekan (excludeId = data.id)
-  const adaBentrok = cekBentrok(
-    data.ruang_id,
-    data.tanggal,
-    data.mulai,
-    data.selesai,
-    data.id
-  );
-
-  if (adaBentrok) {
-    return {
-      error:
-        "Tidak dapat menyetujui: jadwal ini bertumpuk dengan peminjaman yang sudah disetujui pada ruang dan tanggal yang sama.",
-    };
+  // Re-check bentrok sebelum approve (excludeId = diri sendiri agar tidak self-conflict)
+  if (cekBentrok(data.ruang_id, data.tanggal, data.mulai, data.selesai, data.id)) {
+    return { error: "Tidak dapat menyetujui: jadwal ini bertumpuk dengan peminjaman yang sudah disetujui pada ruang dan tanggal yang sama." };
   }
 
   updateStatusPeminjaman(id, "disetujui");
@@ -61,21 +43,17 @@ export async function setujuiPeminjaman(
   return { sukses: "Peminjaman berhasil disetujui." };
 }
 
-// Action: Tolak peminjaman
+// Tolak peminjaman: alasan wajib minimal 5 karakter
 export async function tolakPeminjaman(
   _prevState: AdminActionState,
   formData: FormData
 ): Promise<AdminActionState> {
   await requireAdmin();
 
-  const idStr = formData.get("peminjaman_id") as string;
-  const id = parseInt(idStr, 10);
+  const id = parseInt(formData.get("peminjaman_id") as string, 10);
   if (isNaN(id)) return { error: "ID tidak valid." };
 
-  const alasanRaw = (formData.get("alasan_tolak") as string) ?? "";
-  const alasan = alasanRaw.trim();
-
-  // Alasan penolakan minimal 5 karakter
+  const alasan = ((formData.get("alasan_tolak") as string) ?? "").trim();
   if (alasan.length < 5) {
     return { error: "Alasan penolakan harus minimal 5 karakter." };
   }
