@@ -1,22 +1,11 @@
 "use server";
 
-// Server Action untuk pengajuan peminjaman (/pinjam).
-// Validasi dua lapis: server (di sini) + database constraints (saat migrasi Supabase).
+// Server Action untuk pengajuan peminjaman (/pinjam)
+// Urutan validasi: required → ruang aktif → tanggal → waktu → jumlah → teks → bentrok
 
-import {
-  getRuangById,
-  getRuangAktif,
-  cekBentrok,
-  insertPeminjaman,
-} from "@/lib/dummy-data";
-import {
-  validasiTanggal,
-  validasiWaktu,
-  validasiTeks,
-  validasiJumlahOrang,
-} from "@/lib/validasi";
+import { getRuangById, getRuangAktif, cekBentrok, insertPeminjaman } from "@/lib/dummy-data";
+import { validasiTanggal, validasiWaktu, validasiTeks, validasiJumlahOrang } from "@/lib/validasi";
 
-// Tipe untuk state yang dikembalikan ke form (useActionState)
 export interface FormState {
   errors: {
     ruang_id?: string;
@@ -26,7 +15,7 @@ export interface FormState {
     jumlah_orang?: string;
     peminjam?: string;
     keperluan?: string;
-    umum?: string; // error bentrok atau error server
+    umum?: string; // error bentrok atau error server tak terduga
   };
   values: {
     ruang_id: string;
@@ -37,42 +26,31 @@ export interface FormState {
     peminjam: string;
     keperluan: string;
   };
-  sukses?: {
-    id: number;
-  };
+  sukses?: { id: number };
 }
 
 export const initialState: FormState = {
   errors: {},
-  values: {
-    ruang_id: "",
-    tanggal: "",
-    mulai: "",
-    selesai: "",
-    jumlah_orang: "",
-    peminjam: "",
-    keperluan: "",
-  },
+  values: { ruang_id: "", tanggal: "", mulai: "", selesai: "", jumlah_orang: "", peminjam: "", keperluan: "" },
 };
 
 export async function ajukanPeminjaman(
   _prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
-  // Ambil semua nilai dari form
   const values = {
-    ruang_id: (formData.get("ruang_id") as string) ?? "",
-    tanggal: (formData.get("tanggal") as string) ?? "",
-    mulai: (formData.get("mulai") as string) ?? "",
-    selesai: (formData.get("selesai") as string) ?? "",
-    jumlah_orang: (formData.get("jumlah_orang") as string) ?? "",
-    peminjam: (formData.get("peminjam") as string) ?? "",
-    keperluan: (formData.get("keperluan") as string) ?? "",
+    ruang_id:     (formData.get("ruang_id")     as string) ?? "",
+    tanggal:      (formData.get("tanggal")       as string) ?? "",
+    mulai:        (formData.get("mulai")          as string) ?? "",
+    selesai:      (formData.get("selesai")        as string) ?? "",
+    jumlah_orang: (formData.get("jumlah_orang")  as string) ?? "",
+    peminjam:     (formData.get("peminjam")       as string) ?? "",
+    keperluan:    (formData.get("keperluan")      as string) ?? "",
   };
 
   const errors: FormState["errors"] = {};
 
-  // 1. Validasi field wajib & ruang
+  // 1. Validasi ruang
   const ruangId = parseInt(values.ruang_id, 10);
   if (!values.ruang_id || isNaN(ruangId)) {
     errors.ruang_id = "Pilih ruang yang akan dipinjam.";
@@ -95,20 +73,18 @@ export async function ajukanPeminjaman(
   }
 
   // 3. Validasi waktu
-  if (!values.mulai || !values.selesai) {
-    if (!values.mulai) errors.mulai = "Jam mulai harus diisi.";
-    if (!values.selesai) errors.selesai = "Jam selesai harus diisi.";
-  } else {
+  if (!values.mulai)   errors.mulai   = "Jam mulai harus diisi.";
+  if (!values.selesai) errors.selesai = "Jam selesai harus diisi.";
+  if (values.mulai && values.selesai) {
     const errWaktu = validasiWaktu(values.mulai, values.selesai);
     if (errWaktu) {
-      // Tentukan field mana yang dapat error berdasarkan pesan
       if (errWaktu.includes("mulai")) errors.mulai = errWaktu;
       else if (errWaktu.includes("selesai")) errors.selesai = errWaktu;
-      else errors.mulai = errWaktu; // fallback ke mulai jika ambigu
+      else errors.mulai = errWaktu;
     }
   }
 
-  // 4. Validasi jumlah_orang dan kapasitas
+  // 4. Validasi jumlah orang
   const jumlahOrang = parseInt(values.jumlah_orang, 10);
   if (!values.jumlah_orang || isNaN(jumlahOrang)) {
     errors.jumlah_orang = "Jumlah orang harus diisi dengan angka.";
@@ -120,37 +96,25 @@ export async function ajukanPeminjaman(
     }
   }
 
-  // 5. Validasi teks peminjam & keperluan
-  if (!values.peminjam) {
-    errors.peminjam = "Nama peminjam harus diisi.";
-  }
-  if (!values.keperluan) {
-    errors.keperluan = "Keperluan harus diisi.";
-  }
+  // 5. Validasi teks
+  if (!values.peminjam)  errors.peminjam  = "Nama peminjam harus diisi.";
+  if (!values.keperluan) errors.keperluan = "Keperluan harus diisi.";
   if (values.peminjam && values.keperluan) {
     const errTeks = validasiTeks(values.peminjam, values.keperluan);
-    if (errTeks.peminjam) errors.peminjam = errTeks.peminjam;
+    if (errTeks.peminjam)  errors.peminjam  = errTeks.peminjam;
     if (errTeks.keperluan) errors.keperluan = errTeks.keperluan;
   }
 
-  // Jika ada error, kembalikan tanpa simpan data
-  if (Object.keys(errors).length > 0) {
-    return { errors, values };
-  }
+  if (Object.keys(errors).length > 0) return { errors, values };
 
-  // 6. Cek bentrok dengan jadwal yang sudah disetujui
-  const adaBentrok = cekBentrok(ruangId, values.tanggal, values.mulai, values.selesai);
-  if (adaBentrok) {
+  // 6. Cek bentrok dengan jadwal yang sudah disetujui pada ruang dan tanggal yang sama
+  if (cekBentrok(ruangId, values.tanggal, values.mulai, values.selesai)) {
     return {
-      errors: {
-        umum:
-          "Jadwal yang Anda ajukan bertumpuk dengan peminjaman yang sudah disetujui pada ruang dan tanggal tersebut. Silakan pilih waktu lain.",
-      },
+      errors: { umum: "Jadwal yang Anda ajukan bertumpuk dengan peminjaman yang sudah disetujui. Silakan pilih waktu lain." },
       values,
     };
   }
 
-  // Semua validasi lolos – simpan data
   try {
     const baru = insertPeminjaman({
       ruang_id: ruangId,
@@ -161,26 +125,13 @@ export async function ajukanPeminjaman(
       selesai: values.selesai,
       jumlah_orang: jumlahOrang,
     });
-
-    // Redirect ke halaman sukses tidak bisa return value,
-    // jadi kita kembalikan state sukses lalu client redirect
-    return {
-      errors: {},
-      values,
-      sukses: { id: baru.id },
-    };
+    return { errors: {}, values, sukses: { id: baru.id } };
   } catch (err) {
-    console.error("[ajukanPeminjaman] Error:", err);
-    return {
-      errors: {
-        umum: "Terjadi kesalahan saat menyimpan pengajuan. Silakan coba lagi.",
-      },
-      values,
-    };
+    console.error("[ajukanPeminjaman]", err);
+    return { errors: { umum: "Terjadi kesalahan saat menyimpan pengajuan. Silakan coba lagi." }, values };
   }
 }
 
-// Ambil daftar ruang aktif untuk opsi dropdown form (Server Action)
 export async function getRuangAktifAction() {
   return getRuangAktif();
 }
