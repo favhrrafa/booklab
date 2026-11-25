@@ -18,10 +18,10 @@ export function TombolToggleAktif({ ruang }: TombolRuangProps) {
       <input type="hidden" name="ruang_id" value={ruang.id} />
       <button
         type="submit"
-        className={`text-xs font-semibold px-3 py-1.5 rounded transition-colors ${
+        className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors border ${
           ruang.aktif
-            ? "bg-yellow-100 text-yellow-800 border border-yellow-300 hover:bg-yellow-200"
-            : "bg-green-100 text-green-800 border border-green-300 hover:bg-green-200"
+            ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100"
+            : "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
         }`}
       >
         {ruang.aktif ? "Nonaktifkan" : "Aktifkan"}
@@ -36,7 +36,9 @@ export function TombolHapus({ ruang }: TombolRuangProps) {
   return (
     <div>
       {state.error && (
-        <p className="text-xs text-red-600 mb-1 max-w-xs">⚠️ {state.error}</p>
+        <p className="text-xs text-red-600 mb-1 max-w-xs leading-snug">
+          ⚠️ {state.error}
+        </p>
       )}
       <form
         action={formAction}
@@ -50,9 +52,9 @@ export function TombolHapus({ ruang }: TombolRuangProps) {
         <button
           type="submit"
           disabled={isPending}
-          className="text-xs font-semibold px-3 py-1.5 rounded bg-red-100 text-red-800 border border-red-300 hover:bg-red-200 disabled:opacity-60 transition-colors"
+          className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white text-red-600 border border-red-200 hover:bg-red-50 disabled:opacity-50 transition-colors"
         >
-          {isPending ? "Menghapus..." : "Hapus"}
+          {isPending ? "Menghapus…" : "Hapus"}
         </button>
       </form>
     </div>
