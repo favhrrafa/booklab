@@ -1,31 +1,37 @@
-// Komponen Badge untuk status peminjaman
-// Menggunakan teks + warna agar aksesibel (tidak warna saja)
-
 import { StatusPeminjaman } from "@/lib/types";
 
 interface BadgeStatusProps {
   status: StatusPeminjaman;
 }
 
-const config: Record<StatusPeminjaman, { label: string; className: string }> = {
+const config: Record<
+  StatusPeminjaman,
+  { label: string; dot: string; className: string }
+> = {
   menunggu: {
     label: "Menunggu",
-    className: "bg-yellow-100 text-yellow-800 border border-yellow-300",
+    dot: "bg-amber-400",
+    className: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
   },
   disetujui: {
     label: "Disetujui",
-    className: "bg-green-100 text-green-800 border border-green-300",
+    dot: "bg-emerald-500",
+    className: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
   },
   ditolak: {
     label: "Ditolak",
-    className: "bg-red-100 text-red-800 border border-red-300",
+    dot: "bg-red-500",
+    className: "bg-red-50 text-red-700 ring-1 ring-red-200",
   },
 };
 
 export default function BadgeStatus({ status }: BadgeStatusProps) {
-  const { label, className } = config[status];
+  const { label, dot, className } = config[status];
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${className}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${className}`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
       {label}
     </span>
   );
