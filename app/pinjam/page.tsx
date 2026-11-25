@@ -1,5 +1,4 @@
 // Halaman /pinjam – Server Component pembungkus form.
-// Mengambil daftar ruang aktif di server lalu merender FormPinjam (Client Component).
 
 import { getRuangAktif } from "@/lib/dummy-data";
 import FormPinjam from "./FormPinjam";
@@ -13,17 +12,18 @@ export default async function PinjamPage({ searchParams }: PageProps) {
   const ruangList = getRuangAktif();
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">
-        Ajukan Peminjaman Ruang
-      </h1>
-      <p className="text-sm text-gray-500 mb-6">
-        Isi formulir di bawah ini untuk mengajukan peminjaman. Setelah berhasil,
-        Anda akan mendapatkan Nomor ID pengajuan – simpan nomor tersebut untuk
-        mengecek status persetujuan.
-      </p>
+    <div className="max-w-2xl mx-auto px-4 py-10">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-900 mb-1">
+          Ajukan Peminjaman
+        </h1>
+        <p className="text-sm text-slate-500">
+          Isi formulir di bawah. Setelah berhasil, simpan Nomor ID pengajuan
+          untuk memantau status persetujuan.
+        </p>
+      </div>
 
-      <div className="bg-white border border-gray-200 rounded-xl p-6">
+      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8">
         <FormPinjam ruangList={ruangList} ruangIdAwal={ruang_id} />
       </div>
     </div>
