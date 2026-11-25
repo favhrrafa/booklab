@@ -1,4 +1,4 @@
-// Tipe data utama sesuai skema database PRD
+// Tipe data utama sesuai skema database
 
 export type JenisRuang = "lab" | "kelas" | "aula";
 export type StatusPeminjaman = "menunggu" | "disetujui" | "ditolak";
@@ -17,16 +17,16 @@ export interface Peminjaman {
   ruang_id: number;
   peminjam: string;
   keperluan: string;
-  tanggal: string; // format YYYY-MM-DD
-  mulai: string;   // format HH:MM
-  selesai: string; // format HH:MM
+  tanggal: string; // YYYY-MM-DD
+  mulai: string;   // HH:MM
+  selesai: string; // HH:MM
   jumlah_orang: number;
   status: StatusPeminjaman;
   alasan_tolak: string | null;
   dibuat: string; // ISO timestamp
 }
 
-// Tipe untuk tampilan publik (tanpa data pribadi)
+// Tipe untuk tampilan publik – tidak memuat data pribadi peminjam
 export interface JadwalPublik {
   id: number;
   ruang_id: number;
