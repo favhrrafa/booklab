@@ -1,13 +1,18 @@
 // Halaman /ruang – Daftar Ruang Aktif dengan filter ?jenis=
-// Server Component: data dibaca server-side
+// Server Component
 
 import Link from "next/link";
 import { getRuangAktif } from "@/lib/dummy-data";
 import { JenisRuang } from "@/lib/types";
 import BadgeJenis from "@/components/BadgeJenis";
 
-// Daftar nilai jenis yang diizinkan
 const JENIS_VALID: JenisRuang[] = ["lab", "kelas", "aula"];
+
+const labelJenis: Record<JenisRuang, string> = {
+  lab: "Laboratorium",
+  kelas: "Kelas",
+  aula: "Aula",
+};
 
 interface PageProps {
   searchParams: Promise<{ jenis?: string }>;
@@ -16,7 +21,6 @@ interface PageProps {
 export default async function DaftarRuangPage({ searchParams }: PageProps) {
   const { jenis: jenisParam } = await searchParams;
 
-  // Hanya terima nilai yang valid; jika tidak valid, abaikan filter
   const jenisFilter = JENIS_VALID.includes(jenisParam as JenisRuang)
     ? (jenisParam as JenisRuang)
     : null;
@@ -26,24 +30,27 @@ export default async function DaftarRuangPage({ searchParams }: PageProps) {
     ? semuaRuang.filter((r) => r.jenis === jenisFilter)
     : semuaRuang;
 
-  const labelJenis: Record<JenisRuang, string> = {
-    lab: "Laboratorium",
-    kelas: "Kelas",
-    aula: "Aula",
-  };
-
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Daftar Ruang Tersedia</h1>
+    <div className="max-w-5xl mx-auto px-4 py-10">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-900 mb-1">
+          Daftar Ruang
+        </h1>
+        <p className="text-sm text-slate-500">
+          Ruang yang tersedia untuk dipinjam. Klik ruang untuk melihat jadwal
+          dan mengajukan peminjaman.
+        </p>
+      </div>
 
       {/* Filter Jenis */}
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex flex-wrap gap-2 mb-7">
         <Link
           href="/ruang"
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
             !jenisFilter
-              ? "bg-blue-700 text-white"
-              : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+              ? "bg-blue-600 text-white"
+              : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-800"
           }`}
         >
           Semua
@@ -52,10 +59,10 @@ export default async function DaftarRuangPage({ searchParams }: PageProps) {
           <Link
             key={j}
             href={`/ruang?jenis=${j}`}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
               jenisFilter === j
-                ? "bg-blue-700 text-white"
-                : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
+                ? "bg-blue-600 text-white"
+                : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-800"
             }`}
           >
             {labelJenis[j]}
@@ -65,11 +72,15 @@ export default async function DaftarRuangPage({ searchParams }: PageProps) {
 
       {/* Hasil */}
       {ruangTampil.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">
-          <p className="text-lg">Tidak ada ruang yang tersedia</p>
+        <div className="text-center py-20">
+          <p className="text-slate-400 text-base mb-2">Tidak ada ruang</p>
           {jenisFilter && (
-            <p className="text-sm mt-2">
-              untuk jenis <strong>{labelJenis[jenisFilter]}</strong>.{" "}
+            <p className="text-sm text-slate-400">
+              untuk jenis{" "}
+              <span className="font-medium text-slate-600">
+                {labelJenis[jenisFilter]}
+              </span>
+              .{" "}
               <Link href="/ruang" className="text-blue-600 hover:underline">
                 Lihat semua ruang
               </Link>
@@ -82,18 +93,26 @@ export default async function DaftarRuangPage({ searchParams }: PageProps) {
             <Link
               key={ruang.id}
               href={`/ruang/${ruang.id}`}
-              className="bg-white border border-gray-200 rounded-xl p-5 hover:border-blue-400 hover:shadow-md transition-all group"
+              className="group bg-white border border-slate-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all"
             >
-              <div className="flex items-start justify-between mb-2">
-                <h2 className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors">
+              <div className="flex items-start justify-between mb-3">
+                <h2 className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors leading-snug">
                   {ruang.nama}
                 </h2>
                 <BadgeJenis jenis={ruang.jenis} />
               </div>
-              <p className="text-sm text-gray-500 mb-1">📍 {ruang.lokasi}</p>
-              <p className="text-sm text-gray-500 mb-3">👥 Kapasitas: {ruang.kapasitas} orang</p>
-              <span className="text-xs text-blue-600 font-medium group-hover:underline">
-                Lihat detail & jadwal →
+              <div className="space-y-1 mb-4">
+                <p className="text-xs text-slate-500 flex items-center gap-1.5">
+                  <span className="text-slate-400">📍</span>
+                  {ruang.lokasi}
+                </p>
+                <p className="text-xs text-slate-500 flex items-center gap-1.5">
+                  <span className="text-slate-400">👥</span>
+                  Kapasitas {ruang.kapasitas} orang
+                </p>
+              </div>
+              <span className="text-xs font-medium text-blue-600 group-hover:underline">
+                Lihat detail &amp; jadwal →
               </span>
             </Link>
           ))}
