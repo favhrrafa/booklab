@@ -1,7 +1,6 @@
 "use client";
 
-// Navbar publik – hanya berisi tautan ke halaman publik.
-// Tautan ke /admin TIDAK ada di sini (admin akses langsung via /login).
+// Navbar publik – tidak ada tautan ke /admin (admin akses via /login langsung)
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -19,7 +18,6 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/60">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
-        {/* Logo */}
         <Link
           href="/"
           className="font-bold text-lg tracking-tight text-slate-900 flex items-center gap-2"
@@ -30,7 +28,7 @@ export default function Navbar() {
           <span>PinjamLab</span>
         </Link>
 
-        {/* Navigasi */}
+        {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-1">
           {tautan.map((t) => {
             const aktif = pathname.startsWith(t.href);
