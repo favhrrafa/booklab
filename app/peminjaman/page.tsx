@@ -1,9 +1,5 @@
 // Halaman /peminjaman – Jadwal Publik Semua Ruang (hanya yang disetujui)
-// Server Component.
-// Privasi: TIDAK menampilkan nama peminjam atau keperluan.
-// Catatan: dynamic = "force-dynamic" tidak kompatibel dengan cacheComponents (Next.js 16).
-// Data dummy di-render server-side setiap request; saat migrasi ke Supabase,
-// gunakan cache opt-out melalui konfigurasi fetch atau revalidate.
+// Server Component. Privasi: TIDAK menampilkan nama peminjam atau keperluan.
 
 import { getPeminjamanDisetujui, getRuangById } from "@/lib/dummy-data";
 
@@ -19,46 +15,69 @@ function formatTanggal(tgl: string): string {
 
 export default function JadwalPublikPage() {
   const jadwal = getPeminjamanDisetujui();
-
-  // Filter hanya jadwal hari ini ke depan
   const hariIni = new Date().toISOString().slice(0, 10);
   const jadwalMendatang = jadwal.filter((j) => j.tanggal >= hariIni);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-2">Jadwal Peminjaman</h1>
-      <p className="text-sm text-gray-500 mb-6">
-        Menampilkan seluruh jadwal yang sudah <strong>disetujui</strong> admin.
-        Nama peminjam tidak ditampilkan untuk menjaga privasi.
-      </p>
+    <div className="max-w-5xl mx-auto px-4 py-10">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-900 mb-1">
+          Jadwal Peminjaman
+        </h1>
+        <p className="text-sm text-slate-500">
+          Jadwal yang sudah{" "}
+          <span className="font-medium text-emerald-600">disetujui</span> admin.
+          Nama peminjam tidak ditampilkan untuk menjaga privasi.
+        </p>
+      </div>
 
       {jadwalMendatang.length === 0 ? (
-        <div className="text-center py-16 text-gray-500">
-          <p className="text-lg">Belum ada jadwal peminjaman yang disetujui.</p>
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm py-20 text-center">
+          <p className="text-slate-400">
+            Belum ada jadwal peminjaman yang disetujui.
+          </p>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Tanggal</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Ruang</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Jam Mulai</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Jam Selesai</th>
+              <thead>
+                <tr className="border-b border-slate-100 bg-slate-50/60">
+                  <th className="px-5 py-3 text-left text-xs text-slate-400 font-medium uppercase tracking-wide">
+                    Tanggal
+                  </th>
+                  <th className="px-5 py-3 text-left text-xs text-slate-400 font-medium uppercase tracking-wide">
+                    Ruang
+                  </th>
+                  <th className="px-5 py-3 text-left text-xs text-slate-400 font-medium uppercase tracking-wide">
+                    Mulai
+                  </th>
+                  <th className="px-5 py-3 text-left text-xs text-slate-400 font-medium uppercase tracking-wide">
+                    Selesai
+                  </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-slate-50">
                 {jadwalMendatang.map((j) => {
                   const ruang = getRuangById(j.ruang_id);
                   return (
-                    <tr key={j.id} className="hover:bg-gray-50 text-gray-700">
-                      <td className="px-4 py-3">{formatTanggal(j.tanggal)}</td>
-                      <td className="px-4 py-3 font-medium text-gray-900">
+                    <tr
+                      key={j.id}
+                      className="hover:bg-slate-50/50 transition-colors"
+                    >
+                      <td className="px-5 py-3.5 text-slate-600">
+                        {formatTanggal(j.tanggal)}
+                      </td>
+                      <td className="px-5 py-3.5 font-medium text-slate-800">
                         {ruang?.nama ?? `Ruang #${j.ruang_id}`}
                       </td>
-                      <td className="px-4 py-3 font-mono">{j.mulai}</td>
-                      <td className="px-4 py-3 font-mono">{j.selesai}</td>
+                      <td className="px-5 py-3.5 font-mono text-slate-600">
+                        {j.mulai}
+                      </td>
+                      <td className="px-5 py-3.5 font-mono text-slate-600">
+                        {j.selesai}
+                      </td>
                     </tr>
                   );
                 })}
