@@ -1,23 +1,9 @@
 "use server";
 
-// Server Actions untuk manajemen ruang (/admin/ruang)
-// requireAdmin() dipanggil di AWAL setiap action – lapisan 3 RBAC
-
 import { requireAdmin } from "@/lib/session";
-import { insertRuang, toggleAktifRuang, deleteRuang } from "@/lib/dummy-data";
-import { JenisRuang } from "@/lib/types";
+import { insertRuang, toggleAktifRuang, deleteRuang } from "@/lib/db";
 import { revalidatePath } from "next/cache";
-
-export interface RuangFormState {
-  errors: { nama?: string; jenis?: string; kapasitas?: string; lokasi?: string; umum?: string };
-  values: { nama: string; jenis: string; kapasitas: string; lokasi: string };
-  sukses?: string;
-}
-
-export const ruangInitialState: RuangFormState = {
-  errors: {},
-  values: { nama: "", jenis: "", kapasitas: "", lokasi: "" },
-};
+import type { JenisRuang, RuangFormState, HapusState } from "@/lib/types";
 
 const JENIS_VALID: JenisRuang[] = ["lab", "kelas", "aula"];
 
@@ -36,28 +22,23 @@ export async function tambahRuang(
 
   const errors: RuangFormState["errors"] = {};
 
-  if (values.nama.length < 3 || values.nama.length > 40) {
+  if (values.nama.length < 3 || values.nama.length > 40)
     errors.nama = "Nama ruang harus antara 3 sampai 40 karakter.";
-  }
-  if (!JENIS_VALID.includes(values.jenis as JenisRuang)) {
+  if (!JENIS_VALID.includes(values.jenis as JenisRuang))
     errors.jenis = "Pilih jenis ruang yang valid.";
-  }
   const kapasitas = parseInt(values.kapasitas, 10);
-  if (isNaN(kapasitas) || kapasitas <= 0) {
+  if (isNaN(kapasitas) || kapasitas <= 0)
     errors.kapasitas = "Kapasitas harus bilangan bulat lebih dari 0.";
-  }
-  if (!values.lokasi) {
+  if (!values.lokasi)
     errors.lokasi = "Lokasi harus diisi.";
-  }
 
   if (Object.keys(errors).length > 0) return { errors, values };
 
   try {
-    insertRuang({ nama: values.nama, jenis: values.jenis as JenisRuang, kapasitas, lokasi: values.lokasi });
+    await insertRuang({ nama: values.nama, jenis: values.jenis as JenisRuang, kapasitas, lokasi: values.lokasi });
   } catch (err) {
-    if (err instanceof Error && err.message === "DUPLICATE_NAME") {
+    if (err instanceof Error && err.message === "DUPLICATE_NAME")
       return { errors: { nama: "Nama ruang sudah digunakan. Gunakan nama yang berbeda." }, values };
-    }
     console.error("[tambahRuang]", err);
     return { errors: { umum: "Terjadi kesalahan. Silakan coba lagi." }, values };
   }
@@ -77,19 +58,13 @@ export async function toggleAktif(formData: FormData): Promise<void> {
   await requireAdmin();
   const id = parseInt((formData.get("ruang_id") as string) ?? "", 10);
   if (!isNaN(id)) {
-    toggleAktifRuang(id);
+    await toggleAktifRuang(id);
     revalidatePath("/admin/ruang");
     revalidatePath("/ruang");
     revalidatePath("/");
   }
 }
 
-export interface HapusState {
-  error?: string;
-  sukses?: string;
-}
-
-// Hapus ruang: ditolak jika ada riwayat peminjaman (server + FK RESTRICT sebagai fallback)
 export async function hapusRuang(
   _prevState: HapusState,
   formData: FormData
@@ -98,12 +73,12 @@ export async function hapusRuang(
   const id = parseInt((formData.get("ruang_id") as string) ?? "", 10);
   if (isNaN(id)) return { error: "ID ruang tidak valid." };
 
-  const hasil = deleteRuang(id);
+  const hasil = await deleteRuang(id);
 
-  if (hasil === "has_bookings") {
+  if (hasil === "has_bookings")
     return { error: "Ruang tidak dapat dihapus karena memiliki riwayat peminjaman. Nonaktifkan saja jika tidak ingin digunakan lagi." };
-  }
-  if (hasil === "not_found") return { error: "Ruang tidak ditemukan." };
+  if (hasil === "not_found")
+    return { error: "Ruang tidak ditemukan." };
 
   revalidatePath("/admin/ruang");
   revalidatePath("/ruang");

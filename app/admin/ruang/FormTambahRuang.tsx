@@ -1,27 +1,32 @@
 "use client";
 
-// Form tambah ruang baru
-
 import { useActionState } from "react";
-import { tambahRuang, ruangInitialState } from "./actions";
+import { tambahRuang } from "./actions";
+import type { RuangFormState } from "@/lib/types";
 import { TriangleAlert, CheckCircle2 } from "lucide-react";
 import { kelasInput, labelField, pesanError, alert, tombol } from "@/lib/ui";
 
+// Definisi lokal — tidak diimpor dari "use server" agar tersedia sebelum hydration
+const INITIAL: RuangFormState = {
+  errors: {},
+  values: { nama: "", jenis: "", kapasitas: "", lokasi: "" },
+};
+
 export default function FormTambahRuang() {
-  const [state, formAction, isPending] = useActionState(
-    tambahRuang,
-    ruangInitialState
-  );
+  const [state, formAction, isPending] = useActionState(tambahRuang, INITIAL);
+
+  const errors = state?.errors ?? {};
+  const values = state?.values ?? INITIAL.values;
 
   return (
     <form action={formAction} className="space-y-4">
-      {state.errors.umum && (
+      {errors.umum && (
         <div className={alert.error}>
           <TriangleAlert size={15} className="flex-shrink-0 mt-0.5" aria-hidden />
-          <span>{state.errors.umum}</span>
+          <span>{errors.umum}</span>
         </div>
       )}
-      {state.sukses && (
+      {state?.sukses && (
         <div className={alert.sukses}>
           <CheckCircle2 size={15} className="flex-shrink-0 mt-0.5" aria-hidden />
           <span>{state.sukses}</span>
@@ -37,15 +42,15 @@ export default function FormTambahRuang() {
             type="text"
             id="nama"
             name="nama"
-            defaultValue={state.values.nama}
+            defaultValue={values.nama}
             maxLength={40}
-            className={kelasInput(!!state.errors.nama) + " border"}
+            className={kelasInput(!!errors.nama) + " border"}
             placeholder="Contoh: Lab Komputer 3"
           />
-          {state.errors.nama && (
+          {errors.nama && (
             <p className={pesanError}>
               <TriangleAlert size={11} aria-hidden />
-              {state.errors.nama}
+              {errors.nama}
             </p>
           )}
         </div>
@@ -57,18 +62,18 @@ export default function FormTambahRuang() {
           <select
             id="jenis"
             name="jenis"
-            defaultValue={state.values.jenis}
-            className={kelasInput(!!state.errors.jenis) + " border bg-white"}
+            defaultValue={values.jenis}
+            className={kelasInput(!!errors.jenis) + " border bg-white"}
           >
             <option value="">Pilih jenis…</option>
             <option value="lab">Laboratorium</option>
             <option value="kelas">Kelas</option>
             <option value="aula">Aula</option>
           </select>
-          {state.errors.jenis && (
+          {errors.jenis && (
             <p className={pesanError}>
               <TriangleAlert size={11} aria-hidden />
-              {state.errors.jenis}
+              {errors.jenis}
             </p>
           )}
         </div>
@@ -82,14 +87,14 @@ export default function FormTambahRuang() {
             id="kapasitas"
             name="kapasitas"
             min="1"
-            defaultValue={state.values.kapasitas}
-            className={kelasInput(!!state.errors.kapasitas) + " border"}
+            defaultValue={values.kapasitas}
+            className={kelasInput(!!errors.kapasitas) + " border"}
             placeholder="Contoh: 30"
           />
-          {state.errors.kapasitas && (
+          {errors.kapasitas && (
             <p className={pesanError}>
               <TriangleAlert size={11} aria-hidden />
-              {state.errors.kapasitas}
+              {errors.kapasitas}
             </p>
           )}
         </div>
@@ -102,24 +107,20 @@ export default function FormTambahRuang() {
             type="text"
             id="lokasi"
             name="lokasi"
-            defaultValue={state.values.lokasi}
-            className={kelasInput(!!state.errors.lokasi) + " border"}
+            defaultValue={values.lokasi}
+            className={kelasInput(!!errors.lokasi) + " border"}
             placeholder="Contoh: Gedung A Lantai 2"
           />
-          {state.errors.lokasi && (
+          {errors.lokasi && (
             <p className={pesanError}>
               <TriangleAlert size={11} aria-hidden />
-              {state.errors.lokasi}
+              {errors.lokasi}
             </p>
           )}
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className={tombol.utama}
-      >
+      <button type="submit" disabled={isPending} className={tombol.utama}>
         {isPending ? "Menyimpan…" : "Tambah Ruang"}
       </button>
     </form>

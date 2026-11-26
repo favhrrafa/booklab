@@ -2,9 +2,9 @@
 
 // Komponen tombol Toggle Aktif & Hapus Ruang – Client Component.
 
+import { toggleAktif, hapusRuang } from "./actions";
 import { useActionState } from "react";
-import { toggleAktif, hapusRuang, HapusState } from "./actions";
-import { Ruang } from "@/lib/types";
+import { Ruang, HapusState } from "@/lib/types";
 import { TriangleAlert, PowerOff, Power, Trash2 } from "lucide-react";
 
 interface TombolRuangProps {

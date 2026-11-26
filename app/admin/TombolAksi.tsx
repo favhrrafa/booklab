@@ -2,12 +2,12 @@
 
 // Tombol Setujui dan Tolak – hanya muncul untuk peminjaman berstatus menunggu
 
-import { useActionState, useRef } from "react";
+import { useActionState, useRef, useEffect } from "react";
 import {
   setujuiPeminjaman,
   tolakPeminjaman,
-  AdminActionState,
 } from "./actions";
+import type { AdminActionState } from "@/lib/types";
 import { CheckCircle2, XCircle, TriangleAlert, CheckCheck } from "lucide-react";
 import { tombol } from "@/lib/ui";
 
@@ -54,17 +54,23 @@ export function TombolTolak({ peminjamanId }: TombolAksiProps) {
     initialState
   );
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const formRef   = useRef<HTMLFormElement>(null);
+
+  // Tutup dialog & reset form setelah sukses
+  useEffect(() => {
+    if (state.sukses) {
+      dialogRef.current?.close();
+      formRef.current?.reset();
+    }
+  }, [state.sukses]);
 
   return (
     <div>
-      {state.error && (
-        <p className="text-xs text-red-600 mb-1.5 flex items-center gap-1">
-          <TriangleAlert size={11} aria-hidden />
-          {state.error}
-        </p>
-      )}
       {state.sukses && (
-        <p className="text-xs text-emerald-600 mb-1.5">✓ {state.sukses}</p>
+        <p className="text-xs text-emerald-600 mb-1.5 flex items-center gap-1">
+          <CheckCheck size={11} aria-hidden />
+          {state.sukses}
+        </p>
       )}
 
       <button
@@ -88,7 +94,8 @@ export function TombolTolak({ peminjamanId }: TombolAksiProps) {
             Berikan alasan penolakan minimal 5 karakter.
           </p>
 
-          <form action={formAction} method="dialog">
+          {/* Tidak pakai method="dialog" — form submit lewat Server Action */}
+          <form ref={formRef} action={formAction}>
             <input type="hidden" name="peminjaman_id" value={peminjamanId} />
 
             <div className="mb-5">
@@ -105,7 +112,7 @@ export function TombolTolak({ peminjamanId }: TombolAksiProps) {
                 className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-colors resize-none"
                 placeholder="Minimal 5 karakter…"
               />
-              {state.error?.includes("Alasan") && (
+              {state.error && (
                 <p className="mt-1.5 text-xs text-red-600 flex items-center gap-1">
                   <TriangleAlert size={11} aria-hidden />
                   {state.error}

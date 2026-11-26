@@ -1,19 +1,19 @@
 // Halaman /admin/ruang – manajemen ruang
 
-import { getAllRuang } from "@/lib/dummy-data";
+import { getAllRuang } from "@/lib/db";
 import BadgeJenis from "@/components/BadgeJenis";
 import FormTambahRuang from "./FormTambahRuang";
 import { TombolToggleAktif, TombolHapus } from "./TombolRuang";
 import { Plus, DoorOpen, MapPin, Users } from "lucide-react";
 import { kartu } from "@/lib/ui";
 
-export default function AdminRuangPage() {
-  const semuaRuang = getAllRuang();
+export default async function AdminRuangPage() {
+  const semuaRuang = await getAllRuang();
   const aktif = semuaRuang.filter((r) => r.aktif).length;
   const nonaktif = semuaRuang.length - aktif;
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-5xl mx-auto">
       <div className="mb-7">
         <h1 className="text-xl font-bold text-slate-900 tracking-tight mb-1">
           Kelola Ruang
