@@ -47,11 +47,11 @@ export default async function AdminRuangPage() {
             {semuaRuang.map((ruang) => (
               <div
                 key={ruang.id}
-                className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:bg-slate-50/50 transition-colors"
+                className="px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 hover:bg-teal-50/30 hover:pl-5 transition-all duration-150 group"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
-                    <span className="font-medium text-slate-800 text-sm">
+                    <span className="font-medium text-slate-800 text-sm group-hover:text-teal-700 transition-colors">
                       {ruang.nama}
                     </span>
                     <BadgeJenis jenis={ruang.jenis} />
