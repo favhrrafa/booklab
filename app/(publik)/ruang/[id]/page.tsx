@@ -116,7 +116,7 @@ export default async function DetailRuangPage({ params }: PageProps) {
             {ruang.aktif ? (
               <Link
                 href={`/pinjam?ruang_id=${ruang.id}`}
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 bg-teal-600 text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-teal-700 transition-colors text-sm"
+                className="mt-6 inline-flex w-full items-center justify-center gap-2 bg-teal-600 text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-teal-700 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 text-sm"
               >
                 <CalendarPlus size={15} aria-hidden />
                 Ajukan Peminjaman

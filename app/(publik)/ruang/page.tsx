@@ -84,7 +84,7 @@ export default async function DaftarRuangPage({ searchParams }: PageProps) {
             <Link
               key={ruang.id}
               href={`/ruang/${ruang.id}`}
-              className={`group ${kartu} p-5 hover:border-teal-300 hover:shadow-[0_4px_12px_rgba(13,148,136,0.1)] transition-all`}
+              className={`group ${kartu} p-5 hover:border-teal-300 hover:shadow-[0_6px_18px_rgba(13,148,136,0.12)] hover:-translate-y-1`}
             >
               <div className="flex items-start justify-between mb-3">
                 <h2 className="font-semibold text-slate-800 group-hover:text-teal-700 transition-colors leading-snug">

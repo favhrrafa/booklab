@@ -23,42 +23,42 @@ export default async function BerandaPage() {
     <div className="max-w-7xl mx-auto px-6 py-10 space-y-14">
       {/* ─── Hero ─── */}
       <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-teal-600 via-teal-700 to-emerald-700 px-8 py-16 text-white text-center">
-        {/* lingkaran dekorasi */}
-        <div className="pointer-events-none absolute -top-20 -right-20 w-72 h-72 rounded-full bg-white/5" />
-        <div className="pointer-events-none absolute -bottom-24 -left-16 w-80 h-80 rounded-full bg-black/10" />
+        {/* lingkaran dekorasi — melayang tipis */}
+        <div className="animate-float-slow pointer-events-none absolute -top-20 -right-20 w-72 h-72 rounded-full bg-white/5" />
+        <div className="animate-float-slow-alt pointer-events-none absolute -bottom-24 -left-16 w-80 h-80 rounded-full bg-black/10" />
         {/* ikon dekorasi sudut */}
         <ClipboardList
           size={96}
           strokeWidth={1}
-          className="pointer-events-none absolute -bottom-6 right-6 text-white/5 hidden sm:block"
+          className="animate-icon-drift pointer-events-none absolute -bottom-6 right-6 text-white hidden sm:block"
           aria-hidden
         />
 
         <div className="relative z-10">
-          <span className="inline-flex items-center gap-1.5 mb-5 px-3 py-1 rounded-full bg-white/15 text-xs font-semibold tracking-wider uppercase backdrop-blur-sm border border-white/20">
+          <span className="animate-badge-glow inline-flex items-center gap-1.5 mb-5 px-3 py-1 rounded-full bg-white/15 text-xs font-semibold tracking-wider uppercase backdrop-blur-sm border border-white/20">
             <DoorOpen size={12} aria-hidden />
             Sistem Peminjaman Digital
           </span>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-3 leading-tight">
+          <h1 className="animate-fade-up text-3xl sm:text-4xl font-bold mb-3 leading-tight">
             Pinjam Ruang &amp; Lab
             <br />
             <span className="text-teal-200">Tanpa Bentrok Jadwal</span>
           </h1>
-          <p className="text-teal-100 max-w-md mx-auto text-sm sm:text-base mb-9">
+          <p className="animate-fade-up-delay-1 text-teal-100 max-w-md mx-auto text-sm sm:text-base mb-9">
             Ajukan peminjaman ruang kelas, laboratorium, atau aula sekolah
             secara digital. Cepat, mudah, dan tervalidasi otomatis.
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="animate-fade-up-delay-2 flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/pinjam"
-              className="inline-flex items-center justify-center gap-2 bg-white text-teal-700 font-semibold px-6 py-2.5 rounded-xl hover:bg-teal-50 transition-colors text-sm shadow-sm"
+              className="inline-flex items-center justify-center gap-2 bg-white text-teal-700 font-semibold px-6 py-2.5 rounded-xl hover:bg-teal-50 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 text-sm shadow-sm"
             >
               <CalendarPlus size={16} aria-hidden />
               Ajukan Peminjaman
             </Link>
             <Link
               href="/ruang"
-              className="inline-flex items-center justify-center gap-2 bg-white/15 hover:bg-white/25 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors text-sm border border-white/25 backdrop-blur-sm"
+              className="inline-flex items-center justify-center gap-2 bg-white/15 hover:bg-white/25 hover:-translate-y-0.5 text-white font-semibold px-6 py-2.5 rounded-xl transition-all duration-200 text-sm border border-white/25 backdrop-blur-sm"
             >
               <DoorOpen size={16} aria-hidden />
               Lihat Daftar Ruang
@@ -68,7 +68,7 @@ export default async function BerandaPage() {
       </section>
 
       {/* ─── Statistik ─── */}
-      <section className="grid grid-cols-3 gap-4">
+      <section className="animate-fade-up-delay-3 grid grid-cols-3 gap-4">
         {[
           {
             Icon: DoorOpen,
@@ -94,7 +94,7 @@ export default async function BerandaPage() {
         ].map((s) => (
           <div
             key={s.label}
-            className={`${kartu} p-5 text-center`}
+            className={`${kartu} p-5 text-center hover:-translate-y-0.5`}
           >
             <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mx-auto mb-3`}>
               <s.Icon size={18} className={s.color} aria-hidden />
@@ -106,7 +106,7 @@ export default async function BerandaPage() {
       </section>
 
       {/* ─── Daftar ruang aktif ─── */}
-      <section>
+      <section className="animate-fade-up-delay-4">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-semibold text-slate-800">
             Ruang yang Tersedia
@@ -125,7 +125,7 @@ export default async function BerandaPage() {
             <Link
               key={ruang.id}
               href={`/ruang/${ruang.id}`}
-              className={`group ${kartu} p-5 hover:border-teal-300 hover:shadow-[0_4px_12px_rgba(13,148,136,0.1)] transition-all`}
+              className={`group ${kartu} p-5 hover:border-teal-300 hover:shadow-[0_6px_18px_rgba(13,148,136,0.12)] hover:-translate-y-1`}
             >
               <div className="flex items-start justify-between mb-3">
                 <h3 className="font-semibold text-slate-800 group-hover:text-teal-700 transition-colors leading-snug">
