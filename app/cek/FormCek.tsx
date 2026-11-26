@@ -1,10 +1,20 @@
 "use client";
 
-// Form cek status peminjaman – Client Component (pakai useActionState).
+// Form cek status peminjaman
 
 import { useActionState } from "react";
 import { cekStatusPeminjaman, cekInitialState } from "./actions";
 import BadgeStatus from "@/components/BadgeStatus";
+import {
+  Hash,
+  User,
+  TriangleAlert,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Search,
+} from "lucide-react";
+import { labelField, petunjukField, alert, tombol } from "@/lib/ui";
 
 export default function FormCek() {
   const [state, formAction, isPending] = useActionState(
@@ -15,13 +25,12 @@ export default function FormCek() {
   return (
     <div className="space-y-5">
       <form action={formAction} className="space-y-4">
-        {/* ID Pengajuan */}
         <div>
-          <label
-            htmlFor="id"
-            className="block text-sm font-medium text-slate-700 mb-1.5"
-          >
-            Nomor ID Pengajuan <span className="text-red-500">*</span>
+          <label htmlFor="id" className={labelField}>
+            <span className="inline-flex items-center gap-1.5">
+              <Hash size={13} className="text-slate-400" aria-hidden />
+              Nomor ID Pengajuan <span className="text-red-500">*</span>
+            </span>
           </label>
           <input
             type="number"
@@ -29,55 +38,48 @@ export default function FormCek() {
             name="id"
             min="1"
             defaultValue={state.values?.id ?? ""}
-            className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 placeholder-slate-400 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors"
+            className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-colors"
             placeholder="Contoh: 5"
           />
         </div>
 
-        {/* Nama Peminjam */}
         <div>
-          <label
-            htmlFor="peminjam"
-            className="block text-sm font-medium text-slate-700 mb-1.5"
-          >
-            Nama Peminjam <span className="text-red-500">*</span>
+          <label htmlFor="peminjam" className={labelField}>
+            <span className="inline-flex items-center gap-1.5">
+              <User size={13} className="text-slate-400" aria-hidden />
+              Nama Peminjam <span className="text-red-500">*</span>
+            </span>
           </label>
           <input
             type="text"
             id="peminjam"
             name="peminjam"
             defaultValue={state.values?.peminjam ?? ""}
-            className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 placeholder-slate-400 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors"
+            className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-colors"
             placeholder="Nama persis seperti saat pengajuan"
           />
-          <p className="mt-1 text-xs text-slate-400">
-            Harus sama persis dengan nama yang Anda isi saat pengajuan (case-sensitive).
+          <p className={petunjukField}>
+            Harus sama persis dengan nama saat pengajuan (case-sensitive).
           </p>
         </div>
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
-        >
+        <button type="submit" disabled={isPending} className={tombol.utama + " w-full"}>
+          <Search size={15} aria-hidden />
           {isPending ? "Mencari…" : "Cek Status"}
         </button>
       </form>
 
-      {/* Hasil */}
       {state.submitted && (
         <div>
-          {/* Error / tidak ditemukan */}
           {state.error && (
-            <div className="flex gap-3 bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
-              <span className="flex-shrink-0">⚠️</span>
+            <div className={alert.error}>
+              <TriangleAlert size={15} className="flex-shrink-0 mt-0.5" aria-hidden />
               <span>{state.error}</span>
             </div>
           )}
 
-          {/* Ditemukan */}
           {state.found && state.status && (
-            <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-5">
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-[0_1px_2px_rgba(15,23,42,0.04)] p-5">
               <div className="flex items-center justify-between mb-4">
                 <p className="text-xs text-slate-400 uppercase tracking-wide font-medium">
                   Status Pengajuan #{state.values.id}
@@ -86,35 +88,45 @@ export default function FormCek() {
               </div>
 
               {state.status === "menunggu" && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-700">
-                  <p className="font-medium mb-1">Sedang menunggu persetujuan</p>
-                  <p className="text-amber-600 text-xs">
-                    Admin akan meninjau pengajuan Anda. Silakan cek kembali
-                    beberapa saat lagi.
-                  </p>
+                <div className={alert.peringatan}>
+                  <Clock size={15} className="flex-shrink-0 mt-0.5" aria-hidden />
+                  <div>
+                    <p className="font-medium mb-1">Sedang menunggu persetujuan</p>
+                    <p className="text-xs opacity-80">
+                      Admin akan meninjau pengajuan Anda. Silakan cek kembali
+                      beberapa saat lagi.
+                    </p>
+                  </div>
                 </div>
               )}
 
               {state.status === "disetujui" && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 text-sm text-emerald-700">
-                  <p className="font-medium mb-1">Pengajuan disetujui ✓</p>
-                  <p className="text-emerald-600 text-xs">
-                    Silakan gunakan ruang sesuai jadwal yang telah Anda ajukan.
-                  </p>
+                <div className={alert.sukses}>
+                  <CheckCircle2 size={15} className="flex-shrink-0 mt-0.5" aria-hidden />
+                  <div>
+                    <p className="font-medium mb-1">Pengajuan disetujui</p>
+                    <p className="text-xs opacity-80">
+                      Silakan gunakan ruang sesuai jadwal yang telah Anda
+                      ajukan.
+                    </p>
+                  </div>
                 </div>
               )}
 
               {state.status === "ditolak" && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700">
-                  <p className="font-medium mb-2">Pengajuan ditolak</p>
-                  {state.alasan_tolak && (
-                    <div className="bg-white/70 rounded-md p-3 border border-red-100">
-                      <p className="text-xs text-red-500 uppercase tracking-wide font-medium mb-1">
-                        Alasan
-                      </p>
-                      <p className="text-sm text-red-700">{state.alasan_tolak}</p>
-                    </div>
-                  )}
+                <div className={alert.error}>
+                  <XCircle size={15} className="flex-shrink-0 mt-0.5" aria-hidden />
+                  <div className="flex-1">
+                    <p className="font-medium mb-2">Pengajuan ditolak</p>
+                    {state.alasan_tolak && (
+                      <div className="bg-white/70 rounded-xl p-3 border border-red-100">
+                        <p className="text-xs text-red-500 uppercase tracking-wide font-medium mb-1">
+                          Alasan
+                        </p>
+                        <p className="text-sm text-red-700">{state.alasan_tolak}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>

@@ -4,12 +4,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { DoorOpen, ClipboardList, CalendarPlus, Search } from "lucide-react";
 
 const tautan = [
-  { href: "/ruang", label: "Ruang" },
-  { href: "/peminjaman", label: "Jadwal" },
-  { href: "/pinjam", label: "Ajukan Pinjam" },
-  { href: "/cek", label: "Cek Status" },
+  { href: "/ruang", label: "Ruang", Icon: DoorOpen },
+  { href: "/peminjaman", label: "Jadwal", Icon: ClipboardList },
+  { href: "/pinjam", label: "Ajukan Pinjam", Icon: CalendarPlus },
+  { href: "/cek", label: "Cek Status", Icon: Search },
 ];
 
 export default function Navbar() {
@@ -20,49 +21,54 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
         <Link
           href="/"
-          className="font-bold text-lg tracking-tight text-slate-900 flex items-center gap-2"
+          className="font-bold text-lg tracking-tight text-slate-900 flex items-center gap-2.5"
         >
-          <span className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
-            PL
+          <span className="w-8 h-8 rounded-xl bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center text-white shadow-sm">
+            <DoorOpen size={16} strokeWidth={2.5} aria-hidden />
           </span>
-          <span>PinjamLab</span>
+          <span>
+            Pinjam<span className="text-teal-600">Lab</span>
+          </span>
         </Link>
 
         {/* Desktop nav */}
         <nav className="hidden sm:flex items-center gap-1">
-          {tautan.map((t) => {
-            const aktif = pathname.startsWith(t.href);
+          {tautan.map(({ href, label, Icon }) => {
+            const aktif = pathname.startsWith(href);
             return (
               <Link
-                key={t.href}
-                href={t.href}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                key={href}
+                href={href}
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                   aktif
-                    ? "bg-blue-50 text-blue-700"
+                    ? "bg-teal-50 text-teal-700"
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                 }`}
               >
-                {t.label}
+                <Icon size={14} strokeWidth={2.2} aria-hidden />
+                {label}
               </Link>
             );
           })}
         </nav>
 
         {/* Mobile nav */}
-        <nav className="flex sm:hidden items-center gap-1">
-          {tautan.map((t) => {
-            const aktif = pathname.startsWith(t.href);
+        <nav className="flex sm:hidden items-center gap-0.5">
+          {tautan.map(({ href, label, Icon }) => {
+            const aktif = pathname.startsWith(href);
             return (
               <Link
-                key={t.href}
-                href={t.href}
-                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                key={href}
+                href={href}
+                title={label}
+                aria-label={label}
+                className={`p-2 rounded-lg transition-colors ${
                   aktif
-                    ? "bg-blue-50 text-blue-700"
+                    ? "bg-teal-50 text-teal-700"
                     : "text-slate-500 hover:text-slate-900"
                 }`}
               >
-                {t.label}
+                <Icon size={18} strokeWidth={2.2} aria-hidden />
               </Link>
             );
           })}

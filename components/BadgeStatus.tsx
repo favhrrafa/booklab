@@ -1,20 +1,38 @@
 import { StatusPeminjaman } from "@/lib/types";
+import { Clock, BadgeCheck, XCircle } from "lucide-react";
 
 interface BadgeStatusProps {
   status: StatusPeminjaman;
 }
 
-const config: Record<StatusPeminjaman, { label: string; dot: string; className: string }> = {
-  menunggu: { label: "Menunggu", dot: "bg-amber-400", className: "bg-amber-50 text-amber-700 ring-1 ring-amber-200" },
-  disetujui: { label: "Disetujui", dot: "bg-emerald-500", className: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200" },
-  ditolak: { label: "Ditolak", dot: "bg-red-500", className: "bg-red-50 text-red-700 ring-1 ring-red-200" },
+const config: Record<
+  StatusPeminjaman,
+  { label: string; Icon: React.ElementType; className: string }
+> = {
+  menunggu: {
+    label: "Menunggu",
+    Icon: Clock,
+    className: "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+  },
+  disetujui: {
+    label: "Disetujui",
+    Icon: BadgeCheck,
+    className: "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
+  },
+  ditolak: {
+    label: "Ditolak",
+    Icon: XCircle,
+    className: "bg-red-50 text-red-700 ring-1 ring-red-200",
+  },
 };
 
 export default function BadgeStatus({ status }: BadgeStatusProps) {
-  const { label, dot, className } = config[status];
+  const { label, className, Icon } = config[status];
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${className}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${dot}`} />
+    <span
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${className}`}
+    >
+      <Icon size={11} strokeWidth={2.5} aria-hidden />
       {label}
     </span>
   );

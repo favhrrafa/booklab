@@ -5,6 +5,8 @@ import Link from "next/link";
 import { getRuangAktif } from "@/lib/dummy-data";
 import { JenisRuang } from "@/lib/types";
 import BadgeJenis from "@/components/BadgeJenis";
+import { MapPin, Users, ArrowRight } from "lucide-react";
+import { kartu, chipFilter } from "@/lib/ui";
 
 const JENIS_VALID: JenisRuang[] = ["lab", "kelas", "aula"];
 
@@ -34,7 +36,7 @@ export default async function DaftarRuangPage({ searchParams }: PageProps) {
     <div className="max-w-5xl mx-auto px-4 py-10">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">
+        <h1 className="text-2xl font-bold text-slate-900 tracking-tight mb-1">
           Daftar Ruang
         </h1>
         <p className="text-sm text-slate-500">
@@ -45,25 +47,14 @@ export default async function DaftarRuangPage({ searchParams }: PageProps) {
 
       {/* Filter Jenis */}
       <div className="flex flex-wrap gap-2 mb-7">
-        <Link
-          href="/ruang"
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-            !jenisFilter
-              ? "bg-blue-600 text-white"
-              : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-800"
-          }`}
-        >
+        <Link href="/ruang" className={chipFilter(!jenisFilter)}>
           Semua
         </Link>
         {JENIS_VALID.map((j) => (
           <Link
             key={j}
             href={`/ruang?jenis=${j}`}
-            className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              jenisFilter === j
-                ? "bg-blue-600 text-white"
-                : "bg-white border border-slate-200 text-slate-600 hover:border-slate-300 hover:text-slate-800"
-            }`}
+            className={chipFilter(jenisFilter === j)}
           >
             {labelJenis[j]}
           </Link>
@@ -81,7 +72,7 @@ export default async function DaftarRuangPage({ searchParams }: PageProps) {
                 {labelJenis[jenisFilter]}
               </span>
               .{" "}
-              <Link href="/ruang" className="text-blue-600 hover:underline">
+              <Link href="/ruang" className="text-teal-600 hover:underline">
                 Lihat semua ruang
               </Link>
             </p>
@@ -93,26 +84,27 @@ export default async function DaftarRuangPage({ searchParams }: PageProps) {
             <Link
               key={ruang.id}
               href={`/ruang/${ruang.id}`}
-              className="group bg-white border border-slate-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all"
+              className={`group ${kartu} p-5 hover:border-teal-300 hover:shadow-[0_4px_12px_rgba(13,148,136,0.1)] transition-all`}
             >
               <div className="flex items-start justify-between mb-3">
-                <h2 className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors leading-snug">
+                <h2 className="font-semibold text-slate-800 group-hover:text-teal-700 transition-colors leading-snug">
                   {ruang.nama}
                 </h2>
                 <BadgeJenis jenis={ruang.jenis} />
               </div>
               <div className="space-y-1 mb-4">
                 <p className="text-xs text-slate-500 flex items-center gap-1.5">
-                  <span className="text-slate-400">📍</span>
+                  <MapPin size={11} className="text-slate-400 flex-shrink-0" aria-hidden />
                   {ruang.lokasi}
                 </p>
                 <p className="text-xs text-slate-500 flex items-center gap-1.5">
-                  <span className="text-slate-400">👥</span>
+                  <Users size={11} className="text-slate-400 flex-shrink-0" aria-hidden />
                   Kapasitas {ruang.kapasitas} orang
                 </p>
               </div>
-              <span className="text-xs font-medium text-blue-600 group-hover:underline">
-                Lihat detail &amp; jadwal →
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-teal-600 group-hover:underline">
+                Lihat detail &amp; jadwal
+                <ArrowRight size={11} aria-hidden />
               </span>
             </Link>
           ))}

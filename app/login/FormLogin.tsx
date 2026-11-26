@@ -4,6 +4,8 @@
 
 import { useActionState } from "react";
 import { loginAdmin } from "./actions";
+import { Lock, TriangleAlert, LogIn } from "lucide-react";
+import { alert, tombol } from "@/lib/ui";
 
 export default function FormLogin() {
   const [state, formAction, isPending] = useActionState(loginAdmin, {});
@@ -11,8 +13,8 @@ export default function FormLogin() {
   return (
     <form action={formAction} className="space-y-4">
       {state.error && (
-        <div className="flex gap-2.5 bg-red-50 border border-red-200 rounded-lg p-3.5 text-sm text-red-700">
-          <span className="flex-shrink-0 mt-0.5">⚠️</span>
+        <div className={alert.error}>
+          <TriangleAlert size={15} className="flex-shrink-0 mt-0.5" aria-hidden />
           <span>{state.error}</span>
         </div>
       )}
@@ -22,23 +24,23 @@ export default function FormLogin() {
           htmlFor="password"
           className="block text-sm font-medium text-slate-700 mb-1.5"
         >
-          Kata Sandi Admin
+          <span className="inline-flex items-center gap-1.5">
+            <Lock size={13} className="text-slate-400" aria-hidden />
+            Kata Sandi Admin
+          </span>
         </label>
         <input
           type="password"
           id="password"
           name="password"
           autoComplete="current-password"
-          className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-800 placeholder-slate-400 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition-colors"
+          className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500/25 focus:border-teal-500 transition-colors"
           placeholder="Masukkan kata sandi"
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isPending}
-        className="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm"
-      >
+      <button type="submit" disabled={isPending} className={tombol.utama + " w-full"}>
+        <LogIn size={15} aria-hidden />
         {isPending ? "Memproses…" : "Masuk"}
       </button>
     </form>
