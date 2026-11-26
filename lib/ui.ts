@@ -3,7 +3,7 @@
 
 // Kartu / panel dasar
 export const kartu =
-  "bg-white rounded-2xl border border-slate-200/70 shadow-[0_1px_2px_rgba(15,23,42,0.04)]";
+  "bg-white rounded-2xl border border-slate-200/70 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-all duration-200 ease-out";
 
 // Judul halaman
 export const judulHalaman = "text-2xl font-bold text-slate-900 tracking-tight";
